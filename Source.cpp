@@ -4,6 +4,8 @@
 DWORD entityListStart = 0x0343CB50; 
 DWORD viewMatrix = 0x0494B100; 
 DWORD healthOffset = 0x194; 
+DWORD Width = 0x00C22FE0;
+DWORD Height = 0x00C22FE4;
 HWND hwndBlackOps;
 HBRUSH Brush;
 HDC hdcBlackOps;
@@ -43,7 +45,7 @@ void DrawBorderBox(int x, int y, int w, int h, int thickness)
 }
 void DrawLine(int targetX, int targetY)
 {
-    MoveToEx(hdcBlackOps, 400, 600, NULL);
+    MoveToEx(hdcBlackOps, 0, 0, NULL);
     LineTo(hdcBlackOps, targetX, targetY);
 
 }
@@ -85,7 +87,7 @@ bool WorldToScreen(Vec3 pos, Vec2& screen, float matrix[16], int windowWidth, in
 
 DWORD WINAPI HackThread(HMODULE hModule)
 {
-    hwndBlackOps = FindWindow(0, (L"Call of Duty®: BlackOps"));
+    hwndBlackOps = FindWindow(0, (L"Call of DutyÂ®: BlackOps"));
 
     while (true)
     {
@@ -114,11 +116,13 @@ DWORD WINAPI HackThread(HMODULE hModule)
 
                 //EntityHealh Addr
                 DWORD health = *(DWORD*)(entity + healthOffset);
+                float trueWidth = *(float*)(Width);
+                float trueHeight = *(float*)(Height);
 
                 //Verify if the enemy is still alive
                 if (health > 0) {
                     //3D to 2D
-                    if (WorldToScreen(enemyPos, vScreen, Matrix, 800, 600))
+                    if (WorldToScreen(enemyPos, vScreen, Matrix, trueWidth, trueHeight))
                     {
                         //The EnemyHeadPos
                         float enemyHeadX = *(float*)(entity + 0x118);
@@ -128,7 +132,7 @@ DWORD WINAPI HackThread(HMODULE hModule)
                         Vec3 enemyHeadPos = { enemyHeadX, enemyHeadY, enemyHeadZ };
 
                         //3D to 2D
-                        if (WorldToScreen(enemyHeadPos, vHead, Matrix, 800, 600)) {
+                        if (WorldToScreen(enemyHeadPos, vHead, Matrix, trueWidth, trueHeight)) {
                             //Calcul permettant placer la box
                             float head = vHead.y - vScreen.y;
                             float width = head / 2;
